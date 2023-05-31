@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
 function Table() {
+  const [originalPlanets, setOriginalPlanets] = useState([]);
   const [planets, setPlanets] = useState([]);
+  const [filterByName, setFilterByName] = useState('');
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
@@ -11,12 +13,27 @@ function Table() {
           delete planet.residents;
           return planet;
         });
+        setOriginalPlanets(dataWithoutResidents);
         setPlanets(dataWithoutResidents);
       });
   }, []); // aula do course dia 1 useEffect
 
+  const handleChange = ({ target }) => {
+    const { value } = target;
+    setFilterByName(value);
+    const filteredPlanets = originalPlanets.filter((planet) => planet.name
+      .toLowerCase().includes(value));
+    setPlanets(filteredPlanets);
+  };
+
   return (
     <div>
+      <input
+        data-testid="name-filter"
+        placeholder="Filtrar por nome"
+        onChange={ handleChange }
+        value={ filterByName }
+      />
       <table>
         <thead>
           <tr>
@@ -55,7 +72,6 @@ function Table() {
               </tr>
             ))
           }
-
         </tbody>
       </table>
     </div>
