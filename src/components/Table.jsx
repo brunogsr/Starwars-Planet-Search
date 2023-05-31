@@ -1,29 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import Context from '../context/Context';
 
 function Table() {
-  const [originalPlanets, setOriginalPlanets] = useState([]);
-  const [planets, setPlanets] = useState([]);
+  const {
+    OriginalPlanets,
+    setOriginalPlanets,
+    filteredPlanets,
+  } = useContext(Context);
   const [filterByName, setFilterByName] = useState('');
-
-  useEffect(() => {
-    fetch('https://swapi.dev/api/planets')
-      .then((response) => response.json())
-      .then((data) => {
-        const dataWithoutResidents = data.results.map((planet) => {
-          delete planet.residents;
-          return planet;
-        });
-        setOriginalPlanets(dataWithoutResidents);
-        setPlanets(dataWithoutResidents);
-      });
-  }, []); // aula do course dia 1 useEffect
-
   const handleChange = ({ target }) => {
     const { value } = target;
     setFilterByName(value);
-    const filteredPlanets = originalPlanets.filter((planet) => planet.name
+    const filteredPlanetsByName = filteredPlanets.filter((planet) => planet.name
       .toLowerCase().includes(value));
-    setPlanets(filteredPlanets);
+    setOriginalPlanets(filteredPlanetsByName);
   };
 
   return (
@@ -54,7 +44,7 @@ function Table() {
         </thead>
         <tbody>
           {
-            planets.map((planet) => (
+            OriginalPlanets.map((planet) => (
               <tr key={ planet.name }>
                 <td>{planet.name}</td>
                 <td>{planet.rotation_period}</td>
