@@ -9,72 +9,95 @@ function FilterByNumber() {
   const [columnFilter, setColumnFilter] = useState('population');
   const [comparisonFilter, setComparisonFilter] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
+  const [selectedFilters, setSelectedFilters] = useState([]);
 
   function filterByNumber(event) {
     event.preventDefault();
-    const filter = filteredPlanets.filter((planet) => {
-      switch (comparisonFilter) { // switch para evitar excessos de if
-      case 'maior que':
-        return Number(planet[columnFilter]) > Number(valueFilter);
-      case 'menor que':
-        return Number(planet[columnFilter]) < Number(valueFilter);
-      case 'igual a':
-        return Number(planet[columnFilter]) === Number(valueFilter);
-      default:
-        return planet;
-      }
-    });
-    setOriginalPlanets(filter);
+
+    const newFilter = {
+      column: columnFilter,
+      comparison: comparisonFilter,
+      value: valueFilter,
+    };
+
+    const filters = [...selectedFilters, newFilter];
+
+    const allFilltersApplied = filteredPlanets.filter((planet) => filters
+      .every((allFilters) => {
+        switch (allFilters.comparison) {
+        case 'maior que':
+          return Number(planet[allFilters.column]) > Number(allFilters.value);
+        case 'menor que':
+          return Number(planet[allFilters.column]) < Number(allFilters.value);
+        case 'igual a':
+          return Number(planet[allFilters.column]) === Number(allFilters.value);
+        default:
+          return true;
+        }
+      }));
+
+    setOriginalPlanets(allFilltersApplied);
+    setSelectedFilters(filters);
   }
 
   return (
-    <form onSubmit={ filterByNumber }>
-      <label htmlFor="columnFilter">
-        <select
-          data-testid="column-filter"
-          name="columnFilter"
-          id="columnFilter"
-          value={ columnFilter }
-          onChange={ ({ target }) => setColumnFilter(target.value) }
+    <div>
+
+      <form onSubmit={ filterByNumber }>
+        <label htmlFor="columnFilter">
+          <select
+            data-testid="column-filter"
+            name="columnFilter"
+            id="columnFilter"
+            value={ columnFilter }
+            onChange={ ({ target }) => setColumnFilter(target.value) }
+          >
+            <option value="population">population</option>
+            <option value="orbital_period">orbital_period</option>
+            <option value="diameter">diameter</option>
+            <option value="rotation_period">rotation_period</option>
+            <option value="surface_water">surface_water</option>
+          </select>
+        </label>
+        <label htmlFor="comparisonFilter">
+          <select
+            data-testid="comparison-filter"
+            name="comparisonFilter"
+            id="comparisonFilter"
+            value={ comparisonFilter }
+            onChange={ ({ target }) => setComparisonFilter(target.value) }
+          >
+            <option value="maior que">maior que</option>
+            <option value="menor que">menor que</option>
+            <option value="igual a">igual a</option>
+          </select>
+        </label>
+        <label htmlFor="valueFilter">
+          <input
+            data-testid="value-filter"
+            type="number"
+            name="valueFilter"
+            id="valueFilter"
+            min="0"
+            value={ valueFilter }
+            onChange={ ({ target }) => setValueFilter(target.value) }
+          />
+        </label>
+        <button
+          data-testid="button-filter"
+          type="submit"
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
-        </select>
-      </label>
-      <label htmlFor="comparisonFilter">
-        <select
-          data-testid="comparison-filter"
-          name="comparisonFilter"
-          id="comparisonFilter"
-          value={ comparisonFilter }
-          onChange={ ({ target }) => setComparisonFilter(target.value) }
-        >
-          <option value="maior que">maior que</option>
-          <option value="menor que">menor que</option>
-          <option value="igual a">igual a</option>
-        </select>
-      </label>
-      <label htmlFor="valueFilter">
-        <input
-          data-testid="value-filter"
-          type="number"
-          name="valueFilter"
-          id="valueFilter"
-          min="0"
-          value={ valueFilter }
-          onChange={ ({ target }) => setValueFilter(target.value) }
-        />
-      </label>
-      <button
-        data-testid="button-filter"
-        type="submit"
-      >
-        Filtrar
-      </button>
-    </form>
+          Filtrar
+        </button>
+      </form>
+      <p>
+        Filtros utilizados:
+        {selectedFilters.map((filters, index) => (
+          <span key={ index }>
+            {`${filters.column} ${filters.comparison} ${filters.value}`}
+          </span>))}
+      </p>
+    </div>
   );
 }
 export default FilterByNumber;
