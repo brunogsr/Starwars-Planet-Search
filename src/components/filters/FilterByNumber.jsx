@@ -13,7 +13,6 @@ function FilterByNumber() {
 
   function filterByNumber(event) {
     event.preventDefault();
-
     const newFilter = {
       column: columnFilter,
       comparison: comparisonFilter,
@@ -21,6 +20,7 @@ function FilterByNumber() {
     };
 
     const filters = [...selectedFilters, newFilter];
+    setSelectedFilters(filters);
 
     const allFilltersApplied = filteredPlanets.filter((planet) => filters
       .every((allFilters) => {
@@ -35,9 +35,7 @@ function FilterByNumber() {
           return true;
         }
       }));
-
     setOriginalPlanets(allFilltersApplied);
-    setSelectedFilters(filters);
   }
 
   return (
