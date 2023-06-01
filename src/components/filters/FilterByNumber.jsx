@@ -43,7 +43,7 @@ function FilterByNumber() {
   return (
     <div>
 
-      <form onSubmit={ filterByNumber }>
+      <form>
         <label htmlFor="columnFilter">
           <select
             data-testid="column-filter"
@@ -86,6 +86,7 @@ function FilterByNumber() {
         <button
           data-testid="button-filter"
           type="submit"
+          onClick={ filterByNumber }
         >
           Filtrar
         </button>
@@ -93,8 +94,8 @@ function FilterByNumber() {
       <p>
         Filtros utilizados:
         {selectedFilters.map((filters, index) => (
-          <span key={ index }>
-            {`${filters.column} ${filters.comparison} ${filters.value}`}
+          <span key={ index } data-testid="teste">
+            {` ${filters.column} ${filters.comparison} ${filters.value} `}
           </span>))}
       </p>
     </div>
