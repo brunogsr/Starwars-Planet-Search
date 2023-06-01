@@ -71,7 +71,6 @@ function FilterByNumber() {
       <button
         data-testid="button-filter"
         type="submit"
-        disabled={ valueFilter < 1 }
       >
         Filtrar
       </button>
