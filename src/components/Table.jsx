@@ -1,29 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import Context from '../context/Context';
+import FilterByName from './filters/FilterByName';
+import FilterByNumber from './filters/FilterByNumber';
 
 function Table() {
   const {
     OriginalPlanets,
-    setOriginalPlanets,
-    filteredPlanets,
   } = useContext(Context);
-  const [filterByName, setFilterByName] = useState('');
-  const handleChange = ({ target }) => {
-    const { value } = target;
-    setFilterByName(value);
-    const filteredPlanetsByName = filteredPlanets.filter((planet) => planet.name
-      .toLowerCase().includes(value));
-    setOriginalPlanets(filteredPlanetsByName);
-  };
 
   return (
     <div>
-      <input
-        data-testid="name-filter"
-        placeholder="Filtrar por nome"
-        onChange={ handleChange }
-        value={ filterByName }
-      />
+      <FilterByName />
+      <FilterByNumber />
       <table>
         <thead>
           <tr>
