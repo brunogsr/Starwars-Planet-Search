@@ -2,8 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
 import userEvent from '@testing-library/user-event';
-import { enableFetchMocks } from 'jest-fetch-mock';
-import Provider from '../context/Provider';
 import { act } from 'react-dom/test-utils';
 import testData from '../../cypress/mocks/testData';
 
@@ -13,11 +11,10 @@ describe('Testando StarWars Planets', () => {
   global.fetch.mockResolvedValue({
     json: jest.fn().mockResolvedValue(testData),
   });
-  });
+});
   afterEach(jest.restoreAllMocks)
 
   it('Testa se os inputs e selects estão na tela e se o name input funciona corretamente', async () => {
-
     render(<App />);
     const nameInput = screen.getByTestId('name-filter');
     const columnSelect = screen.getByTestId('column-filter');
@@ -31,67 +28,73 @@ describe('Testando StarWars Planets', () => {
     expect(valueInput).toBeInTheDocument();
     expect(filterButton).toBeInTheDocument();
 
+    const endor = await screen.findByText(/endor/i)
+    const tatooine = await screen.findByText(/tatooine/i)
+
     act(() =>  userEvent.type(nameInput, 'tatooine'));
-    const teste = screen.getAllByRole('row')
-    console.log(teste.innerHTML);
+    // const teste = screen.getAllByRole('row')
+    // console.log(teste.innerHTML);
     
     await waitFor(() => {
-      // expect( screen.getByText(/endor/i)).not.toBeInTheDocument();
-      // expect(screen.getByText('200000')).toBeInTheDocument();
-      // expect(screen.getByText(/desert/i)).toBeInTheDocument();
-      // expect(screen.getByText('10465')).toBeInTheDocument();
-      // expect(screen.getByText(/arid/i)).toBeInTheDocument();
-      // expect(screen.getByText(/304/i)).toBeInTheDocument();
-      // expect(screen.getByText(/2014-12-09/i)).toBeInTheDocument();
-      // expect(screen.getByText(/2014-12-20T20:58:18.411000Z/i)).toBeInTheDocument();
-      // expect(screen.getByText('https://swapi.dev/api/planets/1/')).toBeInTheDocument();
+      expect(endor).not.toBeInTheDocument();
+      expect(tatooine).toBeInTheDocument();
+
     });
   });
 
-  it.skip('Verifica se aparece apenas um planeta ao aplicar o filtro', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        results: [
-          {
-            name: 'Endor',
-            population: '30000000',
-            diameter: '4900',
-            climate: 'temperate',
-          },
-          {
-            name: 'Tatooine',
-            population: '200000',
-            diameter: '10465',
-            climate: 'desert',
-          },
-          {
-            name: 'Yavin IV',
-            population: '1000',
-            diameter: '10200',
-            climate: 'temperate, tropical',
-          }
-        ],
-      })
-    );
-
+  it('Verifica se aparece apenas um planeta ao aplicar o filtro', async () => {
     render(
     <App />
     );
-
     const columnSelect = screen.getByTestId('column-filter');
     const comparisonSelect = screen.getByTestId('comparison-filter');
     const valueInput = screen.getByTestId('value-filter');
     const filterButton = screen.getByRole('button', {name: /filtrar/i});
-  
+    const tatooine = await screen.findByText(/tatooine/i)
+    const endor = await screen.findByText(/endor/i)
+    const coruscant = await screen.findByText(/coruscant/i)
+
     userEvent.selectOptions(columnSelect, 'population');
+    userEvent.selectOptions(comparisonSelect, 'menor que'); 
+    // console.log(comparisonSelect.value)
+    userEvent.type(valueInput, '1000000000'); 
+    act(() =>  userEvent.click(filterButton));
+    await waitFor(() => {
+      const planetNames = screen.queryAllByTestId('planet-name');
+      expect(planetNames).toHaveLength(4);
+      expect(tatooine).toBeInTheDocument()
+      expect(endor).toBeInTheDocument()
+      expect(coruscant).not.toBeInTheDocument()
+    });
+
+    userEvent.selectOptions(columnSelect, 'diameter');
+    userEvent.selectOptions(comparisonSelect, 'maior que'); 
+    // console.log(comparisonSelect.value)
+    userEvent.clear(valueInput)
+    userEvent.type(valueInput, '10200'); 
+    act(() =>  userEvent.click(filterButton));
+
+    await waitFor(() => {
+      const planetNames = screen.queryAllByTestId('planet-name');
+      expect(planetNames).toHaveLength(2);
+      expect(tatooine).toBeInTheDocument()
+      expect(endor).not.toBeInTheDocument()
+      expect(coruscant).not.toBeInTheDocument()
+    });
+
+    userEvent.selectOptions(columnSelect, 'rotation_period');
     userEvent.selectOptions(comparisonSelect, 'igual a'); 
     // console.log(comparisonSelect.value)
-    userEvent.type(valueInput, '30000000'); 
+    userEvent.clear(valueInput)
+    userEvent.type(valueInput, '23'); 
     act(() =>  userEvent.click(filterButton));
-    
+
     await waitFor(() => {
       const planetNames = screen.queryAllByTestId('planet-name');
       expect(planetNames).toHaveLength(1);
+      expect(tatooine).toBeInTheDocument()
+      expect(endor).not.toBeInTheDocument()
+      expect(coruscant).not.toBeInTheDocument()
     });
     // await new Promise(resolve => setTimeout(resolve, 2000)); // pequeno atraso
     // const planetNames = screen.queryAllByTestId('planet-name');
@@ -100,7 +103,6 @@ describe('Testando StarWars Planets', () => {
     // userEvent.selectOptions(comparisonSelect, 'igual a');
     // userEvent.type(valueInput, '4900');
     // userEvent.click(filterButton);
-
     // await waitFor(() => {
     //     expect(screen.getByRole('cell', { name: 'Endor' })).toBeInTheDocument();
     //     expect(screen.getByRole('cell', { name: '30000000' })).toBeInTheDocument();

@@ -40,6 +40,6 @@
   }
 }
 
-body {
-  background-color: dimgray;
+:root {
+  color-scheme: dark light;
 }

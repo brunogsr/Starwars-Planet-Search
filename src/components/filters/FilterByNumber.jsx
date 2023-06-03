@@ -6,6 +6,13 @@ function FilterByNumber() {
     setOriginalPlanets,
     filteredPlanets,
   } = useContext(Context);
+  // const [columnOptions, setColumnOptions] = useState([
+  //   'population',
+  //   'orbital_period',
+  //   'diameter',
+  //   'rotation_period',
+  //   'surface_water',
+  // ]);
   const [columnFilter, setColumnFilter] = useState('population');
   const [comparisonFilter, setComparisonFilter] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
@@ -22,6 +29,7 @@ function FilterByNumber() {
     const filters = [...selectedFilters, newFilter];
     setSelectedFilters(filters);
 
+    setSelectedFilters(filters);
     const allFilltersApplied = filteredPlanets.filter((planet) => filters
       .every((allFilters) => {
         switch (allFilters.comparison) {
@@ -29,18 +37,15 @@ function FilterByNumber() {
           return Number(planet[allFilters.column]) > Number(allFilters.value);
         case 'menor que':
           return Number(planet[allFilters.column]) < Number(allFilters.value);
-        case 'igual a':
-          return Number(planet[allFilters.column]) === Number(allFilters.value);
         default:
-          return true;
+          return Number(planet[allFilters.column]) === Number(allFilters.value);
         }
       }));
     setOriginalPlanets(allFilltersApplied);
   }
-
+  // const columnOfTheFilters = selectedFilters.column;
   return (
     <div>
-
       <form>
         <label htmlFor="columnFilter">
           <select
@@ -50,11 +55,17 @@ function FilterByNumber() {
             value={ columnFilter }
             onChange={ ({ target }) => setColumnFilter(target.value) }
           >
-            <option value="population">population</option>
-            <option value="orbital_period">orbital_period</option>
-            <option value="diameter">diameter</option>
-            <option value="rotation_period">rotation_period</option>
-            <option value="surface_water">surface_water</option>
+            {/* {columnOptions
+              .filter((option) => !columnOfTheFilters.includes(option))
+              .map((option, index) => (
+                <option key={ index } value={ option }>{option}</option>
+              ))} */}
+            <option>population</option>
+            <option>orbital_period</option>
+            <option>diameter</option>
+            <option>rotation_period</option>
+            <option>surface_water</option>
+
           </select>
         </label>
         <label htmlFor="comparisonFilter">
