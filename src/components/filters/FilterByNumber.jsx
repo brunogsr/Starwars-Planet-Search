@@ -6,13 +6,13 @@ function FilterByNumber() {
     setOriginalPlanets,
     filteredPlanets,
   } = useContext(Context);
-  // const [columnOptions, setColumnOptions] = useState([
-  //   'population',
-  //   'orbital_period',
-  //   'diameter',
-  //   'rotation_period',
-  //   'surface_water',
-  // ]);
+  const [columnOptions, setColumnOptions] = useState([
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ]);
   const [columnFilter, setColumnFilter] = useState('population');
   const [comparisonFilter, setComparisonFilter] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
@@ -20,6 +20,7 @@ function FilterByNumber() {
 
   function filterByNumber(event) {
     event.preventDefault();
+    setColumnOptions((prev) => prev.filter((column) => column !== columnFilter));
     const newFilter = {
       column: columnFilter,
       comparison: comparisonFilter,
@@ -27,8 +28,6 @@ function FilterByNumber() {
     };
 
     const filters = [...selectedFilters, newFilter];
-    setSelectedFilters(filters);
-
     setSelectedFilters(filters);
     const allFilltersApplied = filteredPlanets.filter((planet) => filters
       .every((allFilters) => {
@@ -42,8 +41,18 @@ function FilterByNumber() {
         }
       }));
     setOriginalPlanets(allFilltersApplied);
+    setColumnFilter(columnOptions[columnOptions.indexOf(columnFilter) + 1] // seleciona o próximo índice visualmente após apagar o índice anterior
+    || columnOptions[0]); // para evitar undefined, retornará ao índice 0, caso tente ir ao índice 5 (que não existe, pois vai até o índice 4)
+
+    // const columnOfTheFilters = selectedFilters;
+    // console.log(selectedFilters);
   }
-  // const columnOfTheFilters = selectedFilters.column;
+
+  // function handleFilterRemove(filter) {
+  //   const removedFilter = selectedFilters.filter((element) => element !== filter);
+  //   setSelectedFilters(removedFilter);
+  // }
+
   return (
     <div>
       <form>
@@ -55,17 +64,15 @@ function FilterByNumber() {
             value={ columnFilter }
             onChange={ ({ target }) => setColumnFilter(target.value) }
           >
-            {/* {columnOptions
-              .filter((option) => !columnOfTheFilters.includes(option))
+            {columnOptions
               .map((option, index) => (
                 <option key={ index } value={ option }>{option}</option>
-              ))} */}
-            <option>population</option>
+              ))}
+            {/* <option>population</option>
             <option>orbital_period</option>
             <option>diameter</option>
             <option>rotation_period</option>
-            <option>surface_water</option>
-
+            <option>surface_water</option> */}
           </select>
         </label>
         <label htmlFor="comparisonFilter">
@@ -103,8 +110,17 @@ function FilterByNumber() {
       <p>
         Filtros utilizados:
         {selectedFilters.map((filters, index) => (
-          <span key={ index } data-testid="teste">
+          <span key={ index } data-testid="filter">
+            <br />
             {` ${filters.column} ${filters.comparison} ${filters.value} `}
+            <button
+              data-testid="button-remove-filters"
+              type="button"
+              // onClick={ handleFilterRemove }
+            >
+              Remover Filtro Selecionado
+            </button>
+
           </span>))}
       </p>
     </div>

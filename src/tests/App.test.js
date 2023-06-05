@@ -61,6 +61,7 @@ describe('Testando StarWars Planets', () => {
     act(() =>  userEvent.click(filterButton));
     await waitFor(() => {
       const planetNames = screen.queryAllByTestId('planet-name');
+      expect(columnSelect).toHaveValue('orbital_period');
       expect(planetNames).toHaveLength(4);
       expect(tatooine).toBeInTheDocument()
       expect(endor).toBeInTheDocument()
@@ -82,7 +83,6 @@ describe('Testando StarWars Planets', () => {
       expect(coruscant).not.toBeInTheDocument()
     });
 
-    userEvent.selectOptions(columnSelect, 'rotation_period');
     userEvent.selectOptions(comparisonSelect, 'igual a'); 
     // console.log(comparisonSelect.value)
     userEvent.clear(valueInput)
@@ -91,6 +91,7 @@ describe('Testando StarWars Planets', () => {
 
     await waitFor(() => {
       const planetNames = screen.queryAllByTestId('planet-name');
+      expect(columnSelect).toHaveValue('surface_water');
       expect(planetNames).toHaveLength(1);
       expect(tatooine).toBeInTheDocument()
       expect(endor).not.toBeInTheDocument()
