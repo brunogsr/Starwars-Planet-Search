@@ -48,11 +48,6 @@ function FilterByNumber() {
     // console.log(selectedFilters);
   }
 
-  // function handleFilterRemove(filter) {
-  //   const removedFilter = selectedFilters.filter((element) => element !== filter);
-  //   setSelectedFilters(removedFilter);
-  // }
-
   return (
     <div>
       <form>
