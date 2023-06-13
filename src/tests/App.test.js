@@ -113,5 +113,57 @@ describe('Testando StarWars Planets', () => {
     //   expect(planetNames).toHaveLength(4);
     //   });
     });
+    it('Verifica se os filtros de "menor que", "igual a" e "maior que" funcionam corretamente', async () => {
+      await act(() => render(
+        <PlanetsProvider>
+          <App />
+        </PlanetsProvider>
+      ));
+      const planetName = screen.queryAllByTestId('planet-name');
+
+      const columnSelect = screen.getByTestId('column-filter')
+      const comparisonSelect = screen.getByTestId('comparison-filter')
+      const numberInput = screen.getByRole('spinbutton');
+      const filterButton = screen.getByRole('button', {  name: /filtrar/i})
+  
+      userEvent.selectOptions(columnSelect, 'surface_water');
+      userEvent.selectOptions(comparisonSelect, 'menor que');
+      userEvent.type(numberInput, '40');
+      userEvent.click(filterButton);
+  
+      expect(await screen.findAllByRole('row')).toHaveLength(7);
+      userEvent.clear(numberInput);
+  
+      userEvent.selectOptions(columnSelect, 'population');
+      userEvent.selectOptions(comparisonSelect, 'igual a');
+      userEvent.type(numberInput, '1000');
+      userEvent.click(filterButton);
+  
+      expect(await screen.findAllByRole('row')).toHaveLength(2);
+      userEvent.clear(numberInput);
+  
+      userEvent.selectOptions(columnSelect, 'diameter');
+      userEvent.selectOptions(comparisonSelect, 'maior que');
+      userEvent.type(numberInput, '12500');
+      userEvent.click(filterButton);
+  
+      expect(await screen.findAllByRole('row')).toHaveLength(1);
+
+      const buttonRemoveAllFilters = screen.getByTestId('button-remove-filters');
+      const buttonFilter = await screen.findAllByTestId('button-filter');
+  
+    //   userEvent.click(buttonFilter);
+    //   userEvent.click(buttonFilter);
+      act(() =>  userEvent.click(buttonFilter));
+  
+      expect(screen.getAllByTestId('filter')).toHaveLength(5);
+      expect(planetName).toHaveLength(10);
+
+    
+      userEvent.click(buttonRemoveAllFilters);
+      expect(screen.queryAllByTestId('filter')).toHaveLength(0);
+      expect(planetName).toHaveLength(10);
+
+    });
   });
   

@@ -18,18 +18,8 @@ function FilterByNumber() {
   const [valueFilter, setValueFilter] = useState(0);
   const [selectedFilters, setSelectedFilters] = useState([]);
 
-  function filterByNumber(event) {
-    event.preventDefault();
-    setColumnOptions((prev) => prev.filter((column) => column !== columnFilter));
-    const newFilter = {
-      column: columnFilter,
-      comparison: comparisonFilter,
-      value: valueFilter,
-    };
-
-    const filters = [...selectedFilters, newFilter];
-    setSelectedFilters(filters);
-    const allFilltersApplied = filteredPlanets.filter((planet) => filters
+  function filterPlanetsByInputs(filters) {
+    const allFilltersApplied = filteredPlanets.filter((planet) => filters // 3 - filtra
       .every((allFilters) => {
         switch (allFilters.comparison) {
         case 'maior que':
@@ -41,11 +31,35 @@ function FilterByNumber() {
         }
       }));
     setOriginalPlanets(allFilltersApplied);
-    setColumnFilter(columnOptions[columnOptions.indexOf(columnFilter) + 1] // seleciona o próximo índice visualmente após apagar o índice anterior
-    || columnOptions[0]); // para evitar undefined, retornará ao índice 0, caso tente ir ao índice 5 (que não existe, pois vai até o índice 4)
+  }
 
-    // const columnOfTheFilters = selectedFilters;
-    // console.log(selectedFilters);
+  function filterByNumber() {
+    const newFilter = {
+      column: columnFilter,
+      comparison: comparisonFilter,
+      value: valueFilter,
+    };
+    const filters = [...selectedFilters, newFilter]; // 1 - seta filtros ativos
+    const selectedFiltersColumns = filters.map((filtered) => filtered.column);
+
+    setColumnOptions((prev) => prev.filter((column) => !selectedFiltersColumns // 2 - remove ultimo filtro usado
+      .includes(column)));
+
+    setSelectedFilters(filters);
+    filterPlanetsByInputs(filters);
+    setColumnFilter(columnOptions[columnOptions.indexOf(columnFilter) + 1] // 4 - seleciona proximo filtro
+       || columnOptions[0]);
+  }
+
+  function handleDeleteFilter(filterColumn) {
+    const currentFilters = selectedFilters // 1 - remover um filtro dos selecionados
+      .filter((prevFilter) => prevFilter.column !== filterColumn);
+
+    setSelectedFilters(currentFilters);
+
+    setColumnOptions((prev) => ([...prev, filterColumn])); // 2 - retorna o filtro para ser selecionado
+
+    filterPlanetsByInputs(currentFilters); // 3 - filtrar com a nova quantidade de filtros
   }
 
   return (
@@ -96,7 +110,7 @@ function FilterByNumber() {
         </label>
         <button
           data-testid="button-filter"
-          type="submit"
+          type="button"
           onClick={ filterByNumber }
         >
           Filtrar
@@ -109,14 +123,37 @@ function FilterByNumber() {
             <br />
             {` ${filters.column} ${filters.comparison} ${filters.value} `}
             <button
-              data-testid="button-remove-filters"
               type="button"
-              // onClick={ handleFilterRemove }
+              onClick={ () => handleDeleteFilter(filters.column) }
             >
-              Remover Filtro Selecionado
+              X
             </button>
 
           </span>))}
+        <span>
+          <br />
+
+          <button
+            data-testid="button-remove-filters"
+            type="button"
+            onClick={ () => {
+              setOriginalPlanets(filteredPlanets);
+              setColumnOptions([
+                'population',
+                'orbital_period',
+                'diameter',
+                'rotation_period',
+                'surface_water',
+              ]);
+              setColumnFilter('population');
+              setComparisonFilter('maior que');
+              setValueFilter(0);
+              setSelectedFilters([]);
+            } }
+          >
+            Remover todas filtragens
+          </button>
+        </span>
       </p>
     </div>
   );
